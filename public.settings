@@ -1,0 +1,14 @@
+-- Table: public.settings
+
+-- DROP TABLE public.settings;
+
+CREATE TABLE public.settings
+(
+  key text,
+  value text
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.settings
+  OWNER TO tank;
