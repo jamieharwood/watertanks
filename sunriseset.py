@@ -13,14 +13,14 @@ def main():
         # This means something went wrong.
         myled.setSunriseGreen(0.0)
         myled.setSunsetGreen(0.0)
-        myled.setSunriseRed(0.5)
-        myled.setSunsetRed(0.5)
+        myled.setSunriseRed(0.0)
+        myled.setSunsetRed(0.0)
 
         raise ApiError('GET /tasks/ {}'.format(resp.status_code))
     else:
         myled.setSunriseGreen(0.5)
         myled.setSunsetGreen(0.5)
-        myled.setSunriseRed(0.0)
+        myled.setSunriseRed(0.5)
         myled.setSunsetRed(0.0)
         
         retrieved = resp.json()
