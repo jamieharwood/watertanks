@@ -26,6 +26,6 @@ def main():
         sb.five.lights.green.value =  myLed.getHoseGreen()
         sb.five.lights.red.value =  myLed.getHoseRed()
         
-        sleep(10)
+        sleep(2)
 
 main()
