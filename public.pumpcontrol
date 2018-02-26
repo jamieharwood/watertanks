@@ -1,0 +1,13 @@
+-- Table: public.pumpcontrol
+
+-- DROP TABLE public.pumpcontrol;
+
+CREATE TABLE public.pumpcontrol
+(
+  pumpstate numeric NOT NULL DEFAULT 0
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.pumpcontrol
+  OWNER TO tank;
