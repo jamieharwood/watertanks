@@ -12,7 +12,6 @@ def main():
     if resp.status_code != 200:
 
         	# This means something went wrong.
-
 	        raise ApiError('GET /tasks/ {}'.format(resp.status_code))
 
     else:
@@ -43,5 +42,4 @@ def main():
 
         cur.execute(sql)
         myled.setWeatherRed(0.0)
-
 main()
