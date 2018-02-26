@@ -7,6 +7,19 @@ import datetime
 import automationhat
 import RPi.GPIO as gpio
 
+import time
+#import signal
+import scrollphathd
+from scrollphathd.fonts import font5x7
+#from scrollphathd.fonts import font3x5
+
+def getStatusText(sunrise,  sunset):
+    returnString = chr(0) + chr(30) + sunrise[0:5] +"  "
+    returnString = returnString + chr(31) + sunset[0:5]
+    #eturnString = returnString + chr(8)
+    #returnString= char(1)
+    return returnString
+    
 def main():
     state = -2
     myLedControl = ledcontrol() # init remote led control
@@ -16,10 +29,15 @@ def main():
         automationhat.light.power.write(1)
     
     automationhat.light.comms.write(1)
+    
+    time.sleep(0.05) # sleep to give the system time to set the LEDs
+    
     mySettings = settingsClass() # get settings from db
     #mySettings.resetSettings()
+    
+    # setup pwm
     outpin = mySettings.settings['pwmPin']
-    pwmLow = mySettings.settings['pwmLow']
+    #pwmLow = mySettings.settings['pwmLow']
     pwmMid = mySettings.settings['pwmMid']
     pwmHigh = mySettings.settings['pwmHigh']
     
@@ -32,6 +50,12 @@ def main():
     # Get sunrise and sunset from DB
     mySunrise = sunRiseSet()
     
+    # Config the display
+    scrollphathd.set_brightness(0.5)
+    #displayText = getStatusText(str(mySunrise.sunrise),  str(mySunrise.sunset))
+    #scrollphathd.write_string(displayText , x=0, y=0, font=font5x7, brightness=0.7)
+    #scrollphathd.write_string(displayText , x=0, y=0, font=font3x5, brightness=0.5)
+    
     automationhat.light.comms.write(0)
         
     while True:
@@ -43,12 +67,14 @@ def main():
             # irrigation requested
             state = 1
             automationhat.light.comms.write(1) # Comm light on to show activity.
+            scrollphathd.clear()
+            scrollphathd.write_string('  Irrigation on', x=0, y=0, font=font5x7, brightness=0.3)
             
             automationhat.output.one.write(1) # irrigation led on
-            # automationhat.relay.one.write(1) # irrigation solenoid start
+            #automationhat.relay.one.write(1) # irrigation solenoid start
             
             automationhat.output.two.write(0) # hose led off
-            # automationhat.relay.two.write(0) # hose solenoid stop
+            #automationhat.relay.two.write(0) # hose solenoid stop
             
             myPwm.start(pwmHigh) # pump start
             
@@ -60,12 +86,14 @@ def main():
             # hose requested on
             state = 2
             automationhat.light.comms.write(1) # Comm light  on to show activity.
+            scrollphathd.clear()
+            scrollphathd.write_string('  Hose On', x=0, y=0, font=font5x7, brightness=0.7)
             
             automationhat.output.two.write(0) # irrigation led off
-            # automationhat.relay.two.write(0) # irrigation solenoid stop
+            #automationhat.relay.two.write(0) # irrigation solenoid stop
             
             automationhat.output.two.write(1) # hose led on
-            # automationhat.relay.two.write(1) # hose solenoid start
+            #automationhat.relay.two.write(1) # hose solenoid start
             
             myPwm.start(pwmHigh) # pump start
             
@@ -76,13 +104,16 @@ def main():
         elif (automationhat.input.one.read() == False and state != 0):
             # hose requested off
             state = 0
+            scrollphathd.clear()
+            scrollphathd.write_string(getStatusText(str(mySunrise.sunrise),  str(mySunrise.sunset)) , x=0, y=0, font=font5x7, brightness=0.5)
+            
             automationhat.light.comms.write(1) # Comm light  on to show activity.
             
             automationhat.output.one.write(0) # irrigation led off
-            # automationhat.relay.one.write(0) # irrigation solenoid stop
+            #automationhat.relay.one.write(0) # irrigation solenoid stop
             
             automationhat.output.two.write(0) # hose led off
-            # automationhat.relay.two.write(0) # hose solenoid stop
+            #automationhat.relay.two.write(0) # hose solenoid stop
             
             myPwm.start(pwmMid) # pump stop
             
@@ -93,13 +124,16 @@ def main():
         elif (state == -2):
             # BAU state
             state = -1
+            scrollphathd.clear()
+            scrollphathd.write_string(getStatusText(str(mySunrise.sunrise),  str(mySunrise.sunset)) , x=0, y=0, font=font5x7, brightness=0.5)
+            
             automationhat.light.comms.write(1) # Comm light  on to show activity.
             
             automationhat.output.one.write(0) # irrigation led off
-            # automationhat.relay.one.write(0) # irrigation solenoid stop
+            #automationhat.relay.one.write(0) # irrigation solenoid stop
             
             automationhat.output.two.write(0) # hose led off
-            # automationhat.relay.two.write(0) # hose solenoid stop
+            #automationhat.relay.two.write(0) # hose solenoid stop
             
             myPwm.start(pwmMid) # pump stop
             
@@ -107,5 +141,11 @@ def main():
             myLedControl.setHoseGreen(0) # update remote display
             
             automationhat.light.comms.write(0) # Comm light off to show activity.
-    
+        
+        #print(state)
+        
+        # Scroll the display
+        scrollphathd.show()
+        scrollphathd.scroll()
+        #time.sleep(0.05)
 main()
