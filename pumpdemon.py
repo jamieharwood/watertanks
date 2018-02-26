@@ -45,10 +45,10 @@ def main():
             automationhat.light.comms.write(1) # Comm light on to show activity.
             
             automationhat.output.one.write(1) # irrigation led on
-            automationhat.relay.one.write(1) # irrigation solenoid start
+            # automationhat.relay.one.write(1) # irrigation solenoid start
             
             automationhat.output.two.write(0) # hose led off
-            automationhat.relay.two.write(0) # hose solenoid stop
+            # automationhat.relay.two.write(0) # hose solenoid stop
             
             myPwm.start(pwmHigh) # pump start
             
@@ -62,10 +62,10 @@ def main():
             automationhat.light.comms.write(1) # Comm light  on to show activity.
             
             automationhat.output.two.write(0) # irrigation led off
-            automationhat.relay.two.write(0) # irrigation solenoid stop
+            # automationhat.relay.two.write(0) # irrigation solenoid stop
             
             automationhat.output.two.write(1) # hose led on
-            automationhat.relay.two.write(1) # hose solenoid start
+            # automationhat.relay.two.write(1) # hose solenoid start
             
             myPwm.start(pwmHigh) # pump start
             
@@ -79,10 +79,10 @@ def main():
             automationhat.light.comms.write(1) # Comm light  on to show activity.
             
             automationhat.output.one.write(0) # irrigation led off
-            automationhat.relay.one.write(0) # irrigation solenoid stop
+            # automationhat.relay.one.write(0) # irrigation solenoid stop
             
             automationhat.output.two.write(0) # hose led off
-            automationhat.relay.two.write(0) # hose solenoid stop
+            # automationhat.relay.two.write(0) # hose solenoid stop
             
             myPwm.start(pwmMid) # pump stop
             
@@ -96,10 +96,10 @@ def main():
             automationhat.light.comms.write(1) # Comm light  on to show activity.
             
             automationhat.output.one.write(0) # irrigation led off
-            automationhat.relay.one.write(0) # irrigation solenoid stop
+            # automationhat.relay.one.write(0) # irrigation solenoid stop
             
             automationhat.output.two.write(0) # hose led off
-            automationhat.relay.two.write(0) # hose solenoid stop
+            # automationhat.relay.two.write(0) # hose solenoid stop
             
             myPwm.start(pwmMid) # pump stop
             
