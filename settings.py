@@ -5,7 +5,7 @@ import json
 
 class settingsClass:
     settingkey = "settings"
-    settings = {'pumpduration':  5}
+    settings = {'pumpduration':  5, 'pwmLow': 23, 'pwmMid': 36, 'pwmHigh': 48}
     
     def __init__(self):
         self.dbconn = psycopg2.connect(host='192.168.86.23', dbname='tankstore', user='tank', password='skinner2')
