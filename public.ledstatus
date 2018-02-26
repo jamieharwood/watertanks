@@ -1,0 +1,16 @@
+-- Table: public.ledstatus
+
+-- DROP TABLE public.ledstatus;
+
+CREATE TABLE public.ledstatus
+(
+  led numeric NOT NULL DEFAULT 0,
+  red numeric NOT NULL DEFAULT 0,
+  green numeric NOT NULL DEFAULT 0,
+  description text
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.ledstatus
+  OWNER TO tank;
