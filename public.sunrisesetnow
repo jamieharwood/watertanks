@@ -1,0 +1,16 @@
+-- Table: public.sunrisesetnow
+
+-- DROP TABLE public.sunrisesetnow;
+
+CREATE TABLE public.sunrisesetnow
+(
+  id integer NOT NULL DEFAULT nextval('sunrisesetnow_id_seq'::regclass),
+  datestamp timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  sunrise time with time zone,
+  sunset time with time zone
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.sunrisesetnow
+  OWNER TO tank;
