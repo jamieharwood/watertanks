@@ -20,6 +20,12 @@ def main():
         sb.three.lights.green.value =  myLed.getSunsetGreen()
         sb.three.lights.red.value =  myLed.getSunsetRed()
         
+        sb.four.lights.green.value =  myLed.getIrrigationGreen()
+        sb.four.lights.red.value =  myLed.getIrrigationRed()
+        
+        sb.five.lights.green.value =  myLed.getHoseGreen()
+        sb.five.lights.red.value =  myLed.getHoseRed()
+        
         sleep(10)
 
 main()
