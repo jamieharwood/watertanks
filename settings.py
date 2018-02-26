@@ -11,7 +11,7 @@ class settingsClass:
         self.dbconn = psycopg2.connect(host='192.168.86.23', dbname='tankstore', user='tank', password='skinner2')
         self.dbconn.autocommit = True
         self.dbCur = self.dbconn.cursor()
-        
+       #self.resetSettings()
         self.getSettings()
 
     def __call__(self):
@@ -34,3 +34,12 @@ class settingsClass:
             self.dbCur.execute(sql)
             
             self.getSettings()
+
+    def resetSettings(self):
+        sql = "delete from settings"
+        self.dbCur.execute(sql)
+        
+        sql = "insert into settings (key, value) values('"+self.settingkey+"', '"+json.dumps(self.settings)+"')"
+        self.dbCur.execute(sql)
+            
+        self.getSettings()
