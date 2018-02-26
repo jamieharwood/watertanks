@@ -1,0 +1,22 @@
+-- Table: public.weather
+
+-- DROP TABLE public.weather;
+
+CREATE TABLE public.weather
+(
+  id integer NOT NULL DEFAULT nextval('weather_id_seq'::regclass),
+  datestamp timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  weather text,
+  temp_c numeric,
+  wind_dir text,
+  wind_mph numeric,
+  wind_gust_mph numeric,
+  windchill_c numeric,
+  feelslike_c numeric,
+  visibility_mi numeric
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.weather
+  OWNER TO tank;
