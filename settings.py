@@ -41,5 +41,5 @@ class settingsClass:
         
         sql = "insert into settings (key, value) values('"+self.settingkey+"', '"+json.dumps(self.settings)+"')"
         self.dbCur.execute(sql)
-            
+        
         self.getSettings()
