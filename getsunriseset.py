@@ -24,6 +24,7 @@ def main():
         myled.setSunsetRed(0.0)
         
         retrieved = resp.json()
+        
         conn = psycopg2.connect(host='192.168.86.23', dbname='tankstore', user='tank', password='skinner2')
         conn.autocommit = True
         cur = conn.cursor()
