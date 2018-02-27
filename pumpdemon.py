@@ -16,9 +16,9 @@ from scrollphathd.fonts import font5x7
 def getStatusText(sunrise,  sunset):
     nowTime = datetime.datetime.now()
     if (nowTime.minute > 9):
-        returnString = "  N" + str(nowTime.hour) + ":" + str(nowTime.minute) + chr(0)
+        returnString = "  *" + str(nowTime.hour) + ":" + str(nowTime.minute) + chr(0)
     else:
-        returnString = "  N" + str(nowTime.hour) + ":0" + str(nowTime.minute) + chr(0)
+        returnString = "  *" + str(nowTime.hour) + ":0" + str(nowTime.minute) + chr(0)
     returnString = returnString + chr(0) + chr(30) + sunrise[0:5] +"  "
     returnString = returnString + chr(31) + sunset[0:5]
     #eturnString = returnString + chr(8)
@@ -78,23 +78,33 @@ def main():
             scrollphathd.clear()
             scrollphathd.write_string(getStatusText(str(mySunrise.sunrise),  str(mySunrise.sunset)) , x=0, y=0, font=font5x7, brightness=0.5)
         
-        rollTime = myTimeNow.hour + myTimeNow.minute + myTimeNow.second
-        if (rollTime == 1 and dayRollover == -1):
+        rollTime = myTimeNow.hour + myTimeNow.minute
+        #rollTime = 0
+        if (rollTime == 0 and dayRollover == -1):
             mySunrise = sunRiseSet()
             dayRollover = 0
-        elif (rollTime != 1 and dayRollover == 0):
+        elif (rollTime == 0 and dayRollover == 0):
             dayRollover = 0
         else:
             dayRollover = -1
         
         numStartTime = (myTimeNow.hour * 3600) + (myTimeNow.minute * 60) + myTimeNow.second
         
-        if ((numStartTime >= mySunrise.numSunriseSeconds and numStartTime <= (mySunrise.numSunriseSeconds + (mySettings.settings["pumpduration"] * 60))) and state != 1):
+        # complex if conditions so I pulled them into variables
+        ifSunrise = ((numStartTime >= mySunrise.numSunriseSeconds and numStartTime <= (mySunrise.numSunriseSeconds + (mySettings.settings["pumpduration"] * 60))) and state != 1)
+        ifSunset = ((numStartTime >= mySunrise.numSunsetSeconds and numStartTime <= (mySunrise.numSunsetSeconds + (mySettings.settings["pumpduration"] * 60))) and state != 1)
+        ifHose = (automationhat.input.one.read() == True and state != 3)
+        ifBauFromSunrise = (not(numStartTime >= mySunrise.numSunriseSeconds and numStartTime <= (mySunrise.numSunriseSeconds + (mySettings.settings["pumpduration"] * 60))) and state == 1)
+        ifBauFromSunset = (not(numStartTime >= mySunrise.numSunsetSeconds and numStartTime <= (mySunrise.numSunsetSeconds + (mySettings.settings["pumpduration"] * 60))) and state == 2)
+        ifBauFromStartup = ((automationhat.input.one.read() == False and state == 3) or state == -2)
+        
+        #if ((numStartTime >= mySunrise.numSunriseSeconds and numStartTime <= (mySunrise.numSunriseSeconds + (mySettings.settings["pumpduration"] * 60))) and state != 1):
+        if (ifSunrise):
             # sunrise irrigation requested
             state = 1 # Sunrise state
             automationhat.light.comms.write(1) # Comm light on to show activity.
             scrollphathd.clear()
-            scrollphathd.write_string('  Sunrise irrigation on', x=0, y=0, font=font5x7, brightness=0.3)
+            scrollphathd.write_string('  irrigation on: ' + str(mySettings.settings["pumpduration"]) + ' mins', x=0, y=0, font=font5x7, brightness=0.3)
             
             automationhat.output.one.write(1) # irrigation led on
             automationhat.output.two.write(0) # hose led off
@@ -104,12 +114,13 @@ def main():
             myLedControl.setHoseGreen(0) # update remote display
             
             automationhat.light.comms.write(0) # Comm light off to show activity.
-        elif ((numStartTime >= mySunrise.numSunsetSeconds and numStartTime <= (mySunrise.numSunsetSeconds + (mySettings.settings["pumpduration"] * 60))) and state != 1):
+        elif (ifSunset):
+        #elif ((numStartTime >= mySunrise.numSunsetSeconds and numStartTime <= (mySunrise.numSunsetSeconds + (mySettings.settings["pumpduration"] * 60))) and state != 1):
             # sunset irrigation requested
             state = 2 # Sunset state
             automationhat.light.comms.write(1) # Comm light on to show activity.
             scrollphathd.clear()
-            scrollphathd.write_string('  Sunset irrigation on', x=0, y=0, font=font5x7, brightness=0.3)
+            scrollphathd.write_string('  irrigation on: ' + str(mySettings.settings["pumpduration"]) + ' mins', x=0, y=0, font=font5x7, brightness=0.3)
             
             automationhat.output.one.write(1) # irrigation led on
             automationhat.output.two.write(0) # hose led off
@@ -119,12 +130,13 @@ def main():
             myLedControl.setHoseGreen(0) # update remote display
             
             automationhat.light.comms.write(0) # Comm light off to show activity.
-        elif (automationhat.input.one.read() == True and state != 3):
+        elif (ifHose):
+        #elif (automationhat.input.one.read() == True and state != 3):
             # hose requested on
             state = 3 # Hose state
             automationhat.light.comms.write(1) # Comm light  on to show activity.
             scrollphathd.clear()
-            scrollphathd.write_string('  Hose On', x=0, y=0, font=font5x7, brightness=0.7)
+            scrollphathd.write_string(' hose On', x=0, y=0, font=font5x7, brightness=0.7)
             
             automationhat.output.two.write(0) # irrigation led off
             automationhat.output.two.write(1) # hose led on
@@ -134,39 +146,42 @@ def main():
             myLedControl.setHoseGreen(1) # update remote display
             
             automationhat.light.comms.write(0) # Comm light off to show activity.
-        elif (not(numStartTime >= mySunrise.numSunriseSeconds and numStartTime <= (mySunrise.numSunriseSeconds + (mySettings.settings["pumpduration"] * 60))) and state == 1):
+#        if (ifBauFromSunrise):
+        #elif (not(numStartTime >= mySunrise.numSunriseSeconds and numStartTime <= (mySunrise.numSunriseSeconds + (mySettings.settings["pumpduration"] * 60))) and state == 1):
             # BAU state
-            state = -1
-            scrollphathd.clear()
-            scrollphathd.write_string(getStatusText(str(mySunrise.sunrise),  str(mySunrise.sunset)) , x=0, y=0, font=font5x7, brightness=0.5)
-            
-            automationhat.light.comms.write(1) # Comm light  on to show activity.
-            
-            automationhat.output.one.write(0) # irrigation led off
-            automationhat.output.two.write(0) # hose led off
-            myPwm.start(pwmMid) # pump stop
-            
-            myLedControl.setIrrigationGreen(0) # update remote display
-            myLedControl.setHoseGreen(0) # update remote display
-            
-            automationhat.light.comms.write(0) # Comm light off to show activity.
-        elif (not(numStartTime >= mySunrise.numSunsetSeconds and numStartTime <= (mySunrise.numSunsetSeconds + (mySettings.settings["pumpduration"] * 60))) and state == 2):
+#            state = -1
+#            scrollphathd.clear()
+#            scrollphathd.write_string(getStatusText(str(mySunrise.sunrise),  str(mySunrise.sunset)) , x=0, y=0, font=font5x7, brightness=0.5)
+#            
+#            automationhat.light.comms.write(1) # Comm light  on to show activity.
+#            
+#            automationhat.output.one.write(0) # irrigation led off
+#            automationhat.output.two.write(0) # hose led off
+#            myPwm.start(pwmMid) # pump stop
+#            
+#            myLedControl.setIrrigationGreen(0) # update remote display
+#            myLedControl.setHoseGreen(0) # update remote display
+#            
+#            automationhat.light.comms.write(0) # Comm light off to show activity.
+#        elif(ifBauFromSunset):
+        #elif (not(numStartTime >= mySunrise.numSunsetSeconds and numStartTime <= (mySunrise.numSunsetSeconds + (mySettings.settings["pumpduration"] * 60))) and state == 2):
             # BAU state
-            state = -1
-            scrollphathd.clear()
-            scrollphathd.write_string(getStatusText(str(mySunrise.sunrise),  str(mySunrise.sunset)) , x=0, y=0, font=font5x7, brightness=0.5)
-            
-            automationhat.light.comms.write(1) # Comm light  on to show activity.
-            
-            automationhat.output.one.write(0) # irrigation led off
-            automationhat.output.two.write(0) # hose led off
-            myPwm.start(pwmMid) # pump stop
-            
-            myLedControl.setIrrigationGreen(0) # update remote display
-            myLedControl.setHoseGreen(0) # update remote display
-            
-            automationhat.light.comms.write(0) # Comm light off to show activity.
-        elif ((automationhat.input.one.read() == False and state == 3) or state == -2):
+#            state = -1
+#            scrollphathd.clear()
+#            scrollphathd.write_string(getStatusText(str(mySunrise.sunrise),  str(mySunrise.sunset)) , x=0, y=0, font=font5x7, brightness=0.5)
+#            
+#            automationhat.light.comms.write(1) # Comm light  on to show activity.
+#            
+#            automationhat.output.one.write(0) # irrigation led off
+#            automationhat.output.two.write(0) # hose led off
+#            myPwm.start(pwmMid) # pump stop
+#            
+#            myLedControl.setIrrigationGreen(0) # update remote display
+#            myLedControl.setHoseGreen(0) # update remote display
+#            
+#            automationhat.light.comms.write(0) # Comm light off to show activity.
+        elif (ifBauFromSunrise or ifBauFromSunset or ifBauFromStartup):
+        #elif ((automationhat.input.one.read() == False and state == 3) or state == -2):
             # BAU state
             state = -1
             scrollphathd.clear()
