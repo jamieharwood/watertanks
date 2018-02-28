@@ -11,7 +11,7 @@ class settingsClass:
         self.dbconn = psycopg2.connect(host='192.168.86.23', dbname='tankstore', user='tank', password='skinner2')
         self.dbconn.autocommit = True
         self.dbCur = self.dbconn.cursor()
-       #self.resetSettings()
+        #self.resetSettings()
         self.getSettings()
 
     def __call__(self):
