@@ -19,24 +19,43 @@ Servo waterPumpServo;
 #define speedControlMid 1500
 #define speedControlMax 2000
 
-// Setup the PWM for the pump speed controller
-waterPumpServo.attach(pumpPin);
-waterPumpServo.writeMicroseconds(speedControlMid);
-
 // Output
-#define pumpPin 3
+#define pumpPin 4
+#define hosePin 2
+#define irrigationPin 3
  
 void setup() {
-  Wire.begin(8);                // join i2c bus with address #8
+  Wire.begin(20);                // join i2c bus with address #DEC 20 = HEX 14
   Wire.onReceive(receiveEvent); // register event
-  Serial.begin(9600);           // start serial for output
+  //Serial.begin(9600);           // start serial for output
   
   // Setup the PWM for the pump speed controller
   waterPumpServo.attach(pumpPin);
   waterPumpServo.writeMicroseconds(speedControlMid);
+
+  pinMode(hosePin, INPUT_PULLUP);
+  pinMode(irrigationPin, INPUT_PULLUP);
 }
 
 void loop() {
+  int hoseVal = !digitalRead(hosePin);
+  int IrrigationVal = !digitalRead(irrigationPin);
+  
+  if (hoseVal == HIGH) {
+    Wire.write(10);
+    //Serial.println("hose on");
+  } else {
+    Wire.write(11);
+    //Serial.println("hose off");
+  }
+  
+  if (IrrigationVal) {
+    Wire.write(12);
+    //Serial.println("irrigation on");
+  } else {
+    Wire.write(13);
+    //Serial.println("irrigation off");
+  }
   delay(100);
 }
 
@@ -45,8 +64,13 @@ void loop() {
 void receiveEvent(int howMany) {
   while (1 < Wire.available()) { // loop through all but the last
     char c = Wire.read(); // receive byte as a character
-    Serial.print(c);         // print the character
+    //Serial.print(c);         // print the character
   }
   int x = Wire.read();    // receive byte as an integer
-  Serial.println(x);         // print the integer
+  //Serial.println(x);         // print the integer
+  
+  if (x==1)
+    waterPumpServo.writeMicroseconds(speedControlMid);
+  else if (x==2)
+    waterPumpServo.writeMicroseconds(speedControlMax);
 }
