@@ -44,7 +44,7 @@ boolean valuesUpdated = false;
 
 void setup() {
   // initialize both serial ports:
-  Serial.begin(115200);
+  //Serial.begin(115200);
   Serial1.begin(115200);
 
   // Setup the PWM for the pump speed controller
