@@ -6,22 +6,9 @@ from ledcontrolClass import ledcontrol
 from weatherClass import weather
 import datetime
 import automationhat
-#import RPi.GPIO as gpio
-#import smbus
-#import smbus2 as smbus
-#from smbus2 import SMBusWrapper
 from serialClass import sensorComm
-
-#import time
-#import signal
-#import scrollphathd
-#from scrollphathd.fonts import font5x7
-#from scrollphathd.fonts import font3x5
-
-#DEVICE_ADDRESS = 0x14
-#DEVICE_REG_MODE1 = 0x00
-#CONST_PWM_MID = 0x01
-#CONST_PWM_HIGH = 0x02
+from PIL import ImageFont
+import inkyphat
 
 mySensor = sensorComm()
 
@@ -73,14 +60,21 @@ def getPWMByte():
 #        pwmData = bus.read_i2c_block_data(DEVICE_ADDRESS,  0, 3)
 #    
 #    return pwmData
+def updateDisplay(sunrise,  sunset, weather):
+    fontSize = 16
+    # Load the built-in FredokaOne font
+    font = ImageFont.truetype(inkyphat.fonts.FredokaOne, fontSize)
+    inkyphat.set_border(inkyphat.BLACK)
+    inkyphat.text((0, fontSize * 0), "Tank", inkyphat.BLACK, font=font)
+    inkyphat.text((0, fontSize * 1), "Sunrise: " + sunrise.isoformat(), inkyphat.BLACK, font=font)
+    inkyphat.text((0, fontSize * 2), "Sunset: " + sunset.isoformat(), inkyphat.BLACK, font=font)
+    inkyphat.text((0, fontSize * 3), "Weather: " + weather, inkyphat.BLACK, font=font)
+    
+    # And show it!
+    inkyphat.show()
     
 def main():
-    # i2c
-    #DEVICE_ADDRESS = 0x14
-    #DEVICE_REG_MODE1 = 0x00    
-    #setPumpPWM(CONST_PWM_MID)
     
-    #displayBrightness = 0.5
     state = -2 # Startup state
     myWeather  = weather()
     myLedControl = ledcontrol() # init remote led control
@@ -125,6 +119,10 @@ def main():
     currHour = -1
     lastHour = -2
     
+    myWeather.getWeather()
+    
+    updateDisplay(mySunrise.sunrise,  mySunrise.sunset,  myWeather.weather)
+    
     automationhat.light.comms.write(0)
     
     while True:
@@ -143,11 +141,16 @@ def main():
             lastHour = currHour
             myWeather.getWeather()
             myWeather.getRecentTrend()
+            
+            updateDisplay(mySunrise.sunrise,  mySunrise.sunset,  myWeather.weather)
         
         # get new sunrise and sunset times
         rollTime = myTimeNow.hour + myTimeNow.minute
         if (rollTime == 0 and dayRollover == -1):
             mySunrise = sunRiseSet()
+            
+            updateDisplay(mySunrise.sunrise,  mySunrise.sunset,  myWeather.weather)
+            
             dayRollover = 0
         elif (rollTime == 0 and dayRollover == 0):
             dayRollover = 0
@@ -160,6 +163,7 @@ def main():
         #time.sleep(1)
         #automationhat.light.comms.write(1) # Comm light on to show activity.
         mySensor.refresh()
+        #time.sleep(1)
         #automationhat.light.comms.write(0) # Comm light on to show activity.
         #i2cRead = getPWMBlock()
         
