@@ -1,0 +1,9 @@
+python3 sendmq.py -h 0 -i 0 -p 0
+python3 sendmq.py -h 1 -i 0 -p 0
+python3 sendmq.py -h 0 -i 1 -p 0
+python3 sendmq.py -h 1 -i 1 -p 0
+python3 sendmq.py -h 0 -i 0 -p 1
+python3 sendmq.py -h 1 -i 0 -p 1
+python3 sendmq.py -h 0 -i 1 -p 1
+python3 sendmq.py -h 1 -i 1 -p 1
+python3 sendmq.py -h 0 -i 0 -p 0
